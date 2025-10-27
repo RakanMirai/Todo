@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.db-journal
+
+# Environment
+.env
+.env.local
+.env.docker
+
+# IDEs
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Deployment packages
+*.zip
+backend.zip
+fullstack-deployment.zip
+eb-deployment.zip
+
+# AWS
+.elasticbeanstalk/
+
+# Data
+data/
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# OS
+Thumbs.db
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Test files (optional - remove if you want to keep tests)
+test_*.py
+*_test.py
+diagnose.py

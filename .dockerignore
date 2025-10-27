@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.db-journal
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+test_*.py
+*_test.py
+diagnose.py
+test_login.py
+
+# Scripts (but keep start-fullstack.sh)
+*.ps1
+docker-start.ps1
+start-backend.ps1
+fix_auth.ps1
+
+# AWS & Elastic Beanstalk
+.elasticbeanstalk/
+.ebextensions/
+*.zip
+
+# Docker
+docker-compose.yml
+
+# Data files
+data/
+
+# Frontend - exclude build artifacts but keep source
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/start-frontend.ps1
