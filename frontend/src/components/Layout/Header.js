@@ -25,6 +25,9 @@ const Header = () => {
             <Link to="/todos" className="nav-link">
               My Todos
             </Link>
+            <Link to="/images" className="nav-link">
+              Images
+            </Link>
             {user?.role === 'admin' && (
               <Link to="/admin" className="nav-link admin-link">
                 Admin Panel

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #4f46e5; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        .info {
+            background: #e0e7ff;
+            border: 1px solid #6366f1;
+            color: #3730a3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 API Test Page</h1>
+        <p>Use this page to test if the backend is working correctly.</p>
+
+        <!-- Test 1: Health Check -->
+        <div class="test-section">
+            <h2>1. Health Check</h2>
+            <p>Test if the backend server is running</p>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+            <div id="health-result"></div>
+        </div>
+
+        <!-- Test 2: Admin Login -->
+        <div class="test-section">
+            <h2>2. Admin Login</h2>
+            <p>Test login with default admin credentials</p>
+            <div>
+                <input type="text" id="username" value="admin" placeholder="Username">
+                <input type="password" id="password" value="admin123" placeholder="Password">
+            </div>
+            <button onclick="testLogin()">Test Login</button>
+            <div id="login-result"></div>
+        </div>
+
+        <!-- Test 3: Registration -->
+        <div class="test-section">
+            <h2>3. Registration</h2>
+            <p>Test user registration</p>
+            <div>
+                <input type="email" id="reg-email" value="test@example.com" placeholder="Email">
+                <input type="text" id="reg-username" value="testuser" placeholder="Username">
+                <input type="password" id="reg-password" value="TestPass123!" placeholder="Password">
+            </div>
+            <button onclick="testRegister()">Test Register</button>
+            <div id="register-result"></div>
+        </div>
+
+        <!-- Test 4: Get Current User -->
+        <div class="test-section">
+            <h2>4. Get Current User (Authenticated)</h2>
+            <p>Test if authentication works (must login first)</p>
+            <button onclick="testGetUser()">Get Current User</button>
+            <div id="user-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let accessToken = null;
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        async function testHealth() {
+            try {
+                showResult('health-result', 'Testing...', 'info');
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('health-result', 
+                        `✓ SUCCESS!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 
+                        'success');
+                } else {
+                    showResult('health-result', 
+                        `✗ FAILED\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 
+                        'error');
+                }
+            } catch (error) {
+                showResult('health-result', 
+                    `✗ ERROR\n${error.message}\n\nIs the backend running on port 8000?\nRun: python run.py`, 
+                    'error');
+            }
+        }
+
+        async function testLogin() {
+            try {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                showResult('login-result', 'Testing login...', 'info');
+                
+                const formData = new URLSearchParams();
+                formData.append('username', username);
+                formData.append('password', password);
+
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    accessToken = data.access_token;
+                    showResult('login-result', 
+                        `✓ LOGIN SUCCESS!\nStatus: ${response.status}\nAccess Token: ${data.access_token.substring(0, 50)}...\nRefresh Token: ${data.refresh_token.substring(0, 50)}...\n\nToken saved! You can now test authenticated endpoints.`, 
+                        'success');
+                } else {
+                    showResult('login-result', 
+                        `✗ LOGIN FAILED\nStatus: ${response.status}\nError: ${data.detail}\n\nCheck:\n- Is username correct? (${username})\n- Is password correct?\n- Is the database created? (delete todo.db and restart)`, 
+                        'error');
+                }
+            } catch (error) {
+                showResult('login-result', 
+                    `✗ ERROR\n${error.message}`, 
+                    'error');
+            }
+        }
+
+        async function testRegister() {
+            try {
+                const email = document.getElementById('reg-email').value;
+                const username = document.getElementById('reg-username').value;
+                const password = document.getElementById('reg-password').value;
+                
+                showResult('register-result', 'Testing registration...', 'info');
+                
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        username: username,
+                        password: password,
+                        full_name: "Test User"
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 201) {
+                    showResult('register-result', 
+                        `✓ REGISTRATION SUCCESS!\nStatus: ${response.status}\nUser created: ${data.username}\nEmail: ${data.email}\n\nNow try logging in with these credentials!`, 
+                        'success');
+                } else if (response.status === 400) {
+                    showResult('register-result', 
+                        `⚠ User might already exist\nStatus: ${response.status}\nMessage: ${data.detail}\n\nTry different username/email, or try logging in instead.`, 
+                        'error');
+                } else {
+                    showResult('register-result', 
+                        `✗ REGISTRATION FAILED\nStatus: ${response.status}\nError: ${JSON.stringify(data, null, 2)}`, 
+                        'error');
+                }
+            } catch (error) {
+                showResult('register-result', 
+                    `✗ ERROR\n${error.message}`, 
+                    'error');
+            }
+        }
+
+        async function testGetUser() {
+            try {
+                if (!accessToken) {
+                    showResult('user-result', 
+                        '⚠ Please login first to get an access token!', 
+                        'error');
+                    return;
+                }
+                
+                showResult('user-result', 'Getting user info...', 'info');
+                
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('user-result', 
+                        `✓ AUTHENTICATED!\nStatus: ${response.status}\nUser: ${data.username}\nEmail: ${data.email}\nRole: ${data.role}\nVerified: ${data.is_verified}`, 
+                        'success');
+                } else {
+                    showResult('user-result', 
+                        `✗ FAILED\nStatus: ${response.status}\nError: ${data.detail}`, 
+                        'error');
+                }
+            } catch (error) {
+                showResult('user-result', 
+                    `✗ ERROR\n${error.message}`, 
+                    'error');
+            }
+        }
+
+        // Auto-test health on page load
+        window.onload = function() {
+            testHealth();
+        };
+    </script>
+</body>
+</html>

@@ -9,12 +9,12 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import TodoList from './components/Todo/TodoList';
 import AdminPanel from './components/Admin/AdminPanel';
+import ImagesPage from './pages/ImagesPage';
 import './styles/App.css';
 
 // Landing Page Component
 const LandingPage = () => {
   const { isAuthenticated, user } = useAuth();
-
   // Redirect authenticated users to their appropriate page
   if (isAuthenticated) {
     return <Navigate to="/todos" replace />;
@@ -57,6 +57,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <TodoList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/images"
+                element={
+                  <PrivateRoute>
+                    <ImagesPage />
                   </PrivateRoute>
                 }
               />

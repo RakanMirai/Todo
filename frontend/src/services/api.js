@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Use environment variable or default to localhost backend
 // In production (Docker), this will be /api (served from same domain)
-// In development, this will be http://localhost:8000
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// In development, this will be http://localhost:8080
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 // Create axios instance
 const api = axios.create({
@@ -168,6 +168,34 @@ export const adminAPI = {
 
   getSystemStats: async () => {
     const response = await api.get('/admin/stats/overview');
+    return response.data;
+  },
+};
+
+// ============= Image API =============
+
+export const imageAPI = {
+  uploadImage: async (formData) => {
+    const response = await api.post('/images/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  getImages: async () => {
+    const response = await api.get('/images/');
+    return response.data;
+  },
+
+  getImage: async (id) => {
+    const response = await api.get(`/images/${id}`);
+    return response.data;
+  },
+
+  deleteImage: async (id) => {
+    const response = await api.delete(`/images/${id}`);
     return response.data;
   },
 };
